@@ -2,14 +2,14 @@ import AppDispatcher from '../AppDispatcher';
 import { EventEmitter } from 'events';
 import lodash from 'lodash';
 
-let _dealer = { hand: [], total: 0 };
+let _dealer = { hand: [], total: 0, message: 'Dealer', hidden: [] };
 
-let _player = { hand: [], total: 0 };
+let _player = { hand: [], total: 0, message: 'Player' };
 
 let _playDeck = [];
 
 let _deck = [
-  {suit: 'spades', value: [1, 11], img: '🂡'},
+  {suit: 'spades', value: [11, 1], img: '🂡'},
   {suit: 'spades', value: 2, img: '🂢'},
   {suit: 'spades', value: 3, img: '🂣'},
   {suit: 'spades', value: 4, img: '🂤'},
@@ -22,7 +22,7 @@ let _deck = [
   {suit: 'spades', value: 10, img: '🂫'},
   {suit: 'spades', value: 10, img: '🂭'},
   {suit: 'spades', value: 10, img: '🂮'},
-  {suit: 'hearts', value: [1, 11], img: '🂱'},
+  {suit: 'hearts', value: [11, 1], img: '🂱'},
   {suit: 'hearts', value: 2, img: '🂲'},
   {suit: 'hearts', value: 3, img: '🂳'},
   {suit: 'hearts', value: 4, img: '🂴'},
@@ -35,7 +35,7 @@ let _deck = [
   {suit: 'hearts', value: 10, img: '🂻'},
   {suit: 'hearts', value: 10, img: '🂽'},
   {suit: 'hearts', value: 10, img: '🂾'},
-  {suit: 'diamonds', value: [1, 11], img: '🃁'},
+  {suit: 'diamonds', value: [11, 1], img: '🃁'},
   {suit: 'diamonds', value: 2, img: '🃂'},
   {suit: 'diamonds', value: 3, img: '🃃'},
   {suit: 'diamonds', value: 4, img: '🃄'},
@@ -48,7 +48,7 @@ let _deck = [
   {suit: 'diamonds', value: 10, img: '🃋'},
   {suit: 'diamonds', value: 10, img: '🃍'},
   {suit: 'diamonds', value: 10, img: '🃎'},
-  {suit: 'clubs', value: [1, 11], img: '🃑'},
+  {suit: 'clubs', value: [11, 1], img: '🃑'},
   {suit: 'clubs', value: 2, img: '🃒'},
   {suit: 'clubs', value: 3, img: '🃓'},
   {suit: 'clubs', value: 4, img: '🃔'},
@@ -65,6 +65,12 @@ let _deck = [
 
 let _faceDown = {down: null, img: '🂠'};
 
+function getTotal(obj) {
+  return obj.hand.reduce((sum, card, i) => {
+    return parseInt(sum) + parseInt(card.value)
+  }, 0);
+}
+
 class DeckStore extends EventEmitter {
   constructor() {
     super();
@@ -76,19 +82,34 @@ class DeckStore extends EventEmitter {
         case 'SHUFFLE_DECK':
           _playDeck = lodash.shuffle(_deck);
           _dealer.hand = [];
-          _dealer.total = 0;
           _player.hand = [];
-          _player.total = 0;
+
+          _dealer.hidden.push(_playDeck.pop());
+          _dealer.hand.push(_playDeck.pop());
+
           for (var i = 0; i < 2; i++) {
             _player.hand.push(_playDeck.pop());
-            _dealer.hand.push(_playDeck.pop());
           }
+
+          _player.total = getTotal(_player);
+          _dealer.total = getTotal(_dealer);
+
+          _player.message = `Player: ${_player.total}`;
+          _dealer.message = `Dealer: ${_dealer.total}`;
+
           this.emit('CHANGE');
           break;
 
         case 'HIT_ME':
           _player.hand.push(_playDeck.pop());
-          _dealer.hand.push(_playDeck.pop());
+          _player.total = getTotal(_player);
+
+          if (_player.total > 21 ) {
+            _player.message = `BUST! ${_player.total}`;
+          } else {
+            _player.message = `Player: ${_player.total}`;
+          }
+
           this.emit('CHANGE');
           break;
       }
@@ -108,11 +129,14 @@ class DeckStore extends EventEmitter {
       deck: _playDeck,
       dealer: {
         hand: _dealer.hand,
-        total: _dealer.total
+        total: _dealer.total,
+        message: _dealer.message,
+        hidden: _dealer.hidden
       },
       player: {
         hand: _player.hand,
-        total: _player.total
+        total: _player.total,
+        message: _player.message
       }
     };
   }

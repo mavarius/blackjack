@@ -45,7 +45,6 @@ export default class Table extends Component {
       <div className="playingTable">
 
         <div className="row">
-          <button onClick={this._newGame} className="btn btn-success">New Game</button>
           <Deck deck={deck}/>
         </div>
         <div className="row">
@@ -53,7 +52,9 @@ export default class Table extends Component {
           <Player player={player}/>
         </div>
         <div className="row buttons">
-          <button onClick={this._hitMe} className="btn btn-warning">HIT ME</button>
+          <button onClick={this._newGame} className="btn btn-success">NEW GAME</button>
+          { player.total > 0 && player.total <= 21 ? <button onClick={this._hitMe} className="btn btn-danger">HIT ME</button> : <button onClick={this._hitMe} className="btn btn-danger" disabled>HIT ME</button> }
+          { player.total > 0 && player.total <= 21 ? <button className="btn btn-primary">STAND</button> : <button className="btn btn-primary" disabled>STAND</button> }
         </div>
       </div>
     )
