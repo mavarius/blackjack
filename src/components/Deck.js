@@ -9,7 +9,7 @@ export default class Deck extends Component {
     const { deck } = this.props;
 
     return (
-      <div>
+      <div className="deckWell">
         {deck.map((card, i) => {
           if (card.suit === 'hearts' || card.suit === 'diamonds') {
             return <span className="playingCard" key={i} style={{color:'red'}}><span>{card.img}</span></span>

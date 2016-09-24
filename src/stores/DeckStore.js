@@ -2,9 +2,9 @@ import AppDispatcher from '../AppDispatcher';
 import { EventEmitter } from 'events';
 import lodash from 'lodash';
 
-let _dealerHand = [];
+let _dealer = { hand: [], total: 0 };
 
-let _playerHand = [];
+let _player = { hand: [], total: 0 };
 
 let _playDeck = [];
 
@@ -75,17 +75,20 @@ class DeckStore extends EventEmitter {
       switch (action.type) {
         case 'SHUFFLE_DECK':
           _playDeck = lodash.shuffle(_deck);
-          _dealerHand = [];
-          _playerHand = [];
-          // console.log('remaining: ', _playDeck);
-          // console.log('_playerHand: ', _playerHand);
+          _dealer.hand = [];
+          _dealer.total = 0;
+          _player.hand = [];
+          _player.total = 0;
+          for (var i = 0; i < 2; i++) {
+            _player.hand.push(_playDeck.pop());
+            _dealer.hand.push(_playDeck.pop());
+          }
           this.emit('CHANGE');
           break;
+
         case 'HIT_ME':
-          _playerHand.push(_playDeck.pop());
-          _dealerHand.push(_playDeck.pop());
-          // console.log('remaining: ', _playDeck);
-          // console.log('_playerHand: ', _playerHand);
+          _player.hand.push(_playDeck.pop());
+          _dealer.hand.push(_playDeck.pop());
           this.emit('CHANGE');
           break;
       }
@@ -103,8 +106,14 @@ class DeckStore extends EventEmitter {
   getAll() {
     return {
       deck: _playDeck,
-      dealerHand: _dealerHand,
-      playerHand: _playerHand
+      dealer: {
+        hand: _dealer.hand,
+        total: _dealer.total
+      },
+      player: {
+        hand: _player.hand,
+        total: _player.total
+      }
     };
   }
 }

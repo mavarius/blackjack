@@ -6,6 +6,7 @@ import DeckActions from '../actions/DeckActions';
 
 import Deck from './Deck';
 import Player from './Player';
+import Dealer from './Dealer';
 
 export default class Table extends Component {
   constructor(props) {
@@ -38,17 +39,21 @@ export default class Table extends Component {
   }
 
   render() {
-    const { deck, playerHand, dealerHand } = this.state;
+    const { deck, player, dealer } = this.state;
 
     return (
       <div className="playingTable">
-        <button onClick={this._newGame} className="btn btn-success">New Game</button>
-        <button onClick={this._hitMe} className="btn btn-warning">HIT ME</button>
-        <div className="deckWell">
+
+        <div className="row">
+          <button onClick={this._newGame} className="btn btn-success">New Game</button>
           <Deck deck={deck}/>
         </div>
-        <div className="deckWell">
-          <Player playerHand={playerHand}/>
+        <div className="row">
+          <Dealer dealer={dealer}/>
+          <Player player={player}/>
+        </div>
+        <div className="row buttons">
+          <button onClick={this._hitMe} className="btn btn-warning">HIT ME</button>
         </div>
       </div>
     )
