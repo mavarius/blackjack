@@ -6,7 +6,7 @@ let _dealerHand = [];
 
 let _playerHand = [];
 
-let _discards = [];
+let _playDeck = [];
 
 let _deck = [
   {suit: 'spades', value: [1, 11], img: '🂡'},
@@ -70,9 +70,22 @@ class DeckStore extends EventEmitter {
     super();
 
     AppDispatcher.register(action => {
+      const { type, payload } = action;
+
       switch (action.type) {
         case 'SHUFFLE_DECK':
-          _deck = lodash.shuffle(_deck);
+          _playDeck = lodash.shuffle(_deck);
+          _dealerHand = [];
+          _playerHand = [];
+          // console.log('remaining: ', _playDeck);
+          // console.log('_playerHand: ', _playerHand);
+          this.emit('CHANGE');
+          break;
+        case 'HIT_ME':
+          _playerHand.push(_playDeck.pop());
+          _dealerHand.push(_playDeck.pop());
+          // console.log('remaining: ', _playDeck);
+          // console.log('_playerHand: ', _playerHand);
           this.emit('CHANGE');
           break;
       }
@@ -88,7 +101,11 @@ class DeckStore extends EventEmitter {
   }
 
   getAll() {
-    return _deck;
+    return {
+      deck: _playDeck,
+      dealerHand: _dealerHand,
+      playerHand: _playerHand
+    };
   }
 }
 

@@ -5,6 +5,11 @@ const DeckActions = {
     AppDispatcher.dispatch({
       type: 'SHUFFLE_DECK'
     })
+  },
+  hitMe(deck) {
+    AppDispatcher.dispatch({
+      type: 'HIT_ME',
+    })
   }
 }
 

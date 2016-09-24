@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 export default class Deck extends Component {
   constructor(props) {
     super(props);
-
   }
 
   render() {
@@ -18,7 +17,7 @@ export default class Deck extends Component {
             return <span className="playingCard" key={i} style={{color:'black'}}><span>{card.img}</span></span>
           }
         })}
-        <span className="playingCard cardBack" style={{color:'darkslategray'}}><span>🂠</span></span>
+        { deck.length > 0 ? <span className="playingCard cardBack" style={{color:'darkslategray'}}><span>🂠</span></span> : <span></span>}
       </div>
     )
   }
