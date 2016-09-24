@@ -1,0 +1,36 @@
+body {
+  background-color: #032802;
+}
+
+h1 {
+  color: white;
+}
+
+.playingCard {
+  font-size: 200px;
+  position: absolute;
+  height: 181px;
+  width: 141px;
+  background-color: white;
+  overflow: hidden;
+  padding: -10px;
+  border-radius: 5px;
+  border: 10px solid white;
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+.deckWell {
+  background-color: #175914;
+  padding-left: 12px;
+  padding-top: 10px;
+  height: 212px;
+  width: 170px;
+  border-radius: 10px;
+  border: 2px solid white;
+}
+
+.playingCard span {
+  top: -71px;
+  left: -10px;
+  position: relative;
+}

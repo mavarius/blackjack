@@ -1,59 +1,95 @@
 import AppDispatcher from '../AppDispatcher';
 import { EventEmitter } from 'events';
+import lodash from 'lodash';
 
-let deck = [
-  {spades: [1, 11], img: '🂡'},
-  {spades: 2, img: '🂢'},
-  {spades: 3, img: '🂣'},
-  {spades: 4, img: '🂤'},
-  {spades: 5, img: '🂥'},
-  {spades: 6, img: '🂦'},
-  {spades: 7, img: '🂧'},
-  {spades: 8, img: '🂨'},
-  {spades: 9, img: '🂩'},
-  {spades: 10, img: '🂪'},
-  {spades: 10, img: '🂫'},
-  {spades: 10, img: '🂭'},
-  {spades: 10, img: '🂮'},
-  {hearts: [1, 11], img: '🂱'},
-  {hearts: 2, img: '🂲'},
-  {hearts: 3, img: '🂳'},
-  {hearts: 4, img: '🂴'},
-  {hearts: 5, img: '🂵'},
-  {hearts: 6, img: '🂶'},
-  {hearts: 7, img: '🂷'},
-  {hearts: 8, img: '🂸'},
-  {hearts: 9, img: '🂹'},
-  {hearts: 10, img: '🂺'},
-  {hearts: 10, img: '🂻'},
-  {hearts: 10, img: '🂽'},
-  {hearts: 10, img: '🂾'},
-  {diamonds: [1, 11], img: '🃁'},
-  {diamonds: 2, img: '🃂'},
-  {diamonds: 3, img: '🃃'},
-  {diamonds: 4, img: '🃄'},
-  {diamonds: 5, img: '🃅'},
-  {diamonds: 6, img: '🃆'},
-  {diamonds: 7, img: '🃇'},
-  {diamonds: 8, img: '🃈'},
-  {diamonds: 9, img: '🃉'},
-  {diamonds: 10, img: '🃊'},
-  {diamonds: 10, img: '🃋'},
-  {diamonds: 10, img: '🃍'},
-  {diamonds: 10, img: '🃎'},
-  {clubs: [1, 11], img: '	🃑'},
-  {clubs: 2, img: '🃒'},
-  {clubs: 3, img: '🃓'},
-  {clubs: 4, img: '🃔'},
-  {clubs: 5, img: '🃕'},
-  {clubs: 6, img: '🃖'},
-  {clubs: 7, img: '🃗'},
-  {clubs: 8, img: '🃘'},
-  {clubs: 9, img: '🃙'},
-  {clubs: 10, img: '🃚'},
-  {clubs: 10, img: '🃛'},
-  {clubs: 10, img: '🃝'},
-  {clubs: 10, img: '🃞'},
+let _dealerHand = [];
 
-]
-let back = {down: null, img: '🂠'},
+let _playerHand = [];
+
+let _discards = [];
+
+let _deck = [
+  {suit: 'spades', value: [1, 11], img: '🂡'},
+  {suit: 'spades', value: 2, img: '🂢'},
+  {suit: 'spades', value: 3, img: '🂣'},
+  {suit: 'spades', value: 4, img: '🂤'},
+  {suit: 'spades', value: 5, img: '🂥'},
+  {suit: 'spades', value: 6, img: '🂦'},
+  {suit: 'spades', value: 7, img: '🂧'},
+  {suit: 'spades', value: 8, img: '🂨'},
+  {suit: 'spades', value: 9, img: '🂩'},
+  {suit: 'spades', value: 10, img: '🂪'},
+  {suit: 'spades', value: 10, img: '🂫'},
+  {suit: 'spades', value: 10, img: '🂭'},
+  {suit: 'spades', value: 10, img: '🂮'},
+  {suit: 'hearts', value: [1, 11], img: '🂱'},
+  {suit: 'hearts', value: 2, img: '🂲'},
+  {suit: 'hearts', value: 3, img: '🂳'},
+  {suit: 'hearts', value: 4, img: '🂴'},
+  {suit: 'hearts', value: 5, img: '🂵'},
+  {suit: 'hearts', value: 6, img: '🂶'},
+  {suit: 'hearts', value: 7, img: '🂷'},
+  {suit: 'hearts', value: 8, img: '🂸'},
+  {suit: 'hearts', value: 9, img: '🂹'},
+  {suit: 'hearts', value: 10, img: '🂺'},
+  {suit: 'hearts', value: 10, img: '🂻'},
+  {suit: 'hearts', value: 10, img: '🂽'},
+  {suit: 'hearts', value: 10, img: '🂾'},
+  {suit: 'diamonds', value: [1, 11], img: '🃁'},
+  {suit: 'diamonds', value: 2, img: '🃂'},
+  {suit: 'diamonds', value: 3, img: '🃃'},
+  {suit: 'diamonds', value: 4, img: '🃄'},
+  {suit: 'diamonds', value: 5, img: '🃅'},
+  {suit: 'diamonds', value: 6, img: '🃆'},
+  {suit: 'diamonds', value: 7, img: '🃇'},
+  {suit: 'diamonds', value: 8, img: '🃈'},
+  {suit: 'diamonds', value: 9, img: '🃉'},
+  {suit: 'diamonds', value: 10, img: '🃊'},
+  {suit: 'diamonds', value: 10, img: '🃋'},
+  {suit: 'diamonds', value: 10, img: '🃍'},
+  {suit: 'diamonds', value: 10, img: '🃎'},
+  {suit: 'clubs', value: [1, 11], img: '🃑'},
+  {suit: 'clubs', value: 2, img: '🃒'},
+  {suit: 'clubs', value: 3, img: '🃓'},
+  {suit: 'clubs', value: 4, img: '🃔'},
+  {suit: 'clubs', value: 5, img: '🃕'},
+  {suit: 'clubs', value: 6, img: '🃖'},
+  {suit: 'clubs', value: 7, img: '🃗'},
+  {suit: 'clubs', value: 8, img: '🃘'},
+  {suit: 'clubs', value: 9, img: '🃙'},
+  {suit: 'clubs', value: 10, img: '🃚'},
+  {suit: 'clubs', value: 10, img: '🃛'},
+  {suit: 'clubs', value: 10, img: '🃝'},
+  {suit: 'clubs', value: 10, img: '🃞'}
+];
+
+let _faceDown = {down: null, img: '🂠'};
+
+class DeckStore extends EventEmitter {
+  constructor() {
+    super();
+
+    AppDispatcher.register(action => {
+      switch (action.type) {
+        case 'SHUFFLE_DECK':
+          _deck = lodash.shuffle(_deck);
+          this.emit('CHANGE');
+          break;
+      }
+    });
+  }
+
+  startListening(cb) {
+    this.on('CHANGE', cb);
+  }
+
+  stopListening(cb) {
+    this.removeListener('CHANGE', cb);
+  }
+
+  getAll() {
+    return _deck;
+  }
+}
+
+export default new DeckStore();
