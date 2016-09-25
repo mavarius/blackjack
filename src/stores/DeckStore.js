@@ -150,6 +150,9 @@ class DeckStore extends EventEmitter {
             } else if (_dealer.total > 21) {
               _player.message = `You Win! ${_player.total}`;
               _dealer.message = `BUST! ${_dealer.total}`;
+            } else if (_player.total === 21) {
+              _player.message = `PUSH ${_player.total}`;
+              _dealer.message = `PUSH ${_dealer.total}`;
             } else {
               _dealer.message = `House Wins! ${_dealer.total}`;
             }
