@@ -9,7 +9,7 @@ let _player = { hand: [], total: 0, message: 'Player' };
 let _playDeck = [];
 
 let _deck = [
-  {suit: 'spades', value: [1, 11], img: '🂡'},
+  {suit: 'spades', value: 11, img: '🂡'},
   {suit: 'spades', value: 2, img: '🂢'},
   {suit: 'spades', value: 3, img: '🂣'},
   {suit: 'spades', value: 4, img: '🂤'},
@@ -22,7 +22,7 @@ let _deck = [
   {suit: 'spades', value: 10, img: '🂫'},
   {suit: 'spades', value: 10, img: '🂭'},
   {suit: 'spades', value: 10, img: '🂮'},
-  {suit: 'hearts', value: [1, 11], img: '🂱'},
+  {suit: 'hearts', value: 11, img: '🂱'},
   {suit: 'hearts', value: 2, img: '🂲'},
   {suit: 'hearts', value: 3, img: '🂳'},
   {suit: 'hearts', value: 4, img: '🂴'},
@@ -35,7 +35,7 @@ let _deck = [
   {suit: 'hearts', value: 10, img: '🂻'},
   {suit: 'hearts', value: 10, img: '🂽'},
   {suit: 'hearts', value: 10, img: '🂾'},
-  {suit: 'diamonds', value: [1, 11], img: '🃁'},
+  {suit: 'diamonds', value: 11, img: '🃁'},
   {suit: 'diamonds', value: 2, img: '🃂'},
   {suit: 'diamonds', value: 3, img: '🃃'},
   {suit: 'diamonds', value: 4, img: '🃄'},
@@ -48,7 +48,7 @@ let _deck = [
   {suit: 'diamonds', value: 10, img: '🃋'},
   {suit: 'diamonds', value: 10, img: '🃍'},
   {suit: 'diamonds', value: 10, img: '🃎'},
-  {suit: 'clubs', value: [1, 11], img: '🃑'},
+  {suit: 'clubs', value: 11, img: '🃑'},
   {suit: 'clubs', value: 2, img: '🃒'},
   {suit: 'clubs', value: 3, img: '🃓'},
   {suit: 'clubs', value: 4, img: '🃔'},
@@ -66,9 +66,18 @@ let _deck = [
 let _faceDown = {down: null, img: '🂠'};
 
 function getTotal(obj) {
-  return obj.hand.reduce((sum, card, i) => {
+  let aces = 0
+  let total = obj.hand.reduce((sum, card, i) => {
+    card.value === 11 ? aces++ : aces
     return parseInt(sum) + parseInt(card.value)
   }, 0);
+
+  while (total > 21 && aces) {
+    total -= 10
+    aces--
+  };
+
+  return total;
 }
 
 class DeckStore extends EventEmitter {
@@ -130,12 +139,11 @@ class DeckStore extends EventEmitter {
             } else {
               _dealer.message = `House Wins! ${_dealer.total}`;
             }
-          } else if (_dealer.total < 17) {
-            while (_dealer.total < 21) {
+          } else if (_dealer.total < 21) {
+            if (_dealer.total < 17) {
               _dealer.hand.push(_playDeck.pop());
               _dealer.total = getTotal(_dealer);
               _dealer.message = `Dealer: ${_dealer.total}`;
-              this.emit('CHANGE');
             }
             if (_dealer.total < _player.total) {
               _player.message = `You Win! ${_player.total}`;
