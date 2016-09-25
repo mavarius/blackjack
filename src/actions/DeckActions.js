@@ -1,15 +1,21 @@
 import AppDispatcher from '../AppDispatcher';
 
 const DeckActions = {
-  shuffle(deck) {
+  shuffle() {
     AppDispatcher.dispatch({
       type: 'SHUFFLE_DECK'
     })
   },
-  
-  hitMe(deck) {
+
+  hitMe() {
     AppDispatcher.dispatch({
-      type: 'HIT_ME',
+      type: 'HIT_ME'
+    })
+  },
+
+  stand() {
+    AppDispatcher.dispatch({
+      type: 'STAND'
     })
   }
 }

@@ -9,7 +9,7 @@ let _player = { hand: [], total: 0, message: 'Player' };
 let _playDeck = [];
 
 let _deck = [
-  {suit: 'spades', value: [11, 1], img: '🂡'},
+  {suit: 'spades', value: [1, 11], img: '🂡'},
   {suit: 'spades', value: 2, img: '🂢'},
   {suit: 'spades', value: 3, img: '🂣'},
   {suit: 'spades', value: 4, img: '🂤'},
@@ -22,7 +22,7 @@ let _deck = [
   {suit: 'spades', value: 10, img: '🂫'},
   {suit: 'spades', value: 10, img: '🂭'},
   {suit: 'spades', value: 10, img: '🂮'},
-  {suit: 'hearts', value: [11, 1], img: '🂱'},
+  {suit: 'hearts', value: [1, 11], img: '🂱'},
   {suit: 'hearts', value: 2, img: '🂲'},
   {suit: 'hearts', value: 3, img: '🂳'},
   {suit: 'hearts', value: 4, img: '🂴'},
@@ -35,7 +35,7 @@ let _deck = [
   {suit: 'hearts', value: 10, img: '🂻'},
   {suit: 'hearts', value: 10, img: '🂽'},
   {suit: 'hearts', value: 10, img: '🂾'},
-  {suit: 'diamonds', value: [11, 1], img: '🃁'},
+  {suit: 'diamonds', value: [1, 11], img: '🃁'},
   {suit: 'diamonds', value: 2, img: '🃂'},
   {suit: 'diamonds', value: 3, img: '🃃'},
   {suit: 'diamonds', value: 4, img: '🃄'},
@@ -48,7 +48,7 @@ let _deck = [
   {suit: 'diamonds', value: 10, img: '🃋'},
   {suit: 'diamonds', value: 10, img: '🃍'},
   {suit: 'diamonds', value: 10, img: '🃎'},
-  {suit: 'clubs', value: [11, 1], img: '🃑'},
+  {suit: 'clubs', value: [1, 11], img: '🃑'},
   {suit: 'clubs', value: 2, img: '🃒'},
   {suit: 'clubs', value: 3, img: '🃓'},
   {suit: 'clubs', value: 4, img: '🃔'},
@@ -82,6 +82,7 @@ class DeckStore extends EventEmitter {
         case 'SHUFFLE_DECK':
           _playDeck = lodash.shuffle(_deck);
           _dealer.hand = [];
+          _dealer.hidden = [];
           _player.hand = [];
 
           _dealer.hidden.push(_playDeck.pop());
@@ -106,8 +107,44 @@ class DeckStore extends EventEmitter {
 
           if (_player.total > 21 ) {
             _player.message = `BUST! ${_player.total}`;
+            _dealer.message = `House Wins!`;
           } else {
             _player.message = `Player: ${_player.total}`;
+          }
+
+          this.emit('CHANGE');
+          break;
+
+        case 'STAND':
+          _dealer.hand.push(_dealer.hidden.pop());
+          _dealer.total = getTotal(_dealer);
+          _dealer.message = `Dealer: ${_dealer.total}`;
+
+          if (_dealer.total > 21) {
+            _player.message = `You Win! ${_player.total}`;
+            _dealer.message = `BUST! ${_dealer.total}`;
+          } else if (_dealer.total === 21) {
+            if (_player.total === 21) {
+              _player.message = `PUSH ${_player.total}`;
+              _dealer.message = `PUSH ${_dealer.total}`;
+            } else {
+              _dealer.message = `House Wins! ${_dealer.total}`;
+            }
+          } else if (_dealer.total < 17) {
+            while (_dealer.total < 21) {
+              _dealer.hand.push(_playDeck.pop());
+              _dealer.total = getTotal(_dealer);
+              _dealer.message = `Dealer: ${_dealer.total}`;
+              this.emit('CHANGE');
+            }
+            if (_dealer.total < _player.total) {
+              _player.message = `You Win! ${_player.total}`;
+            } else if (_dealer.total > 21) {
+              _player.message = `You Win! ${_player.total}`;
+              _dealer.message = `BUST! ${_dealer.total}`;
+            } else {
+              _dealer.message = `House Wins! ${_dealer.total}`;
+            }
           }
 
           this.emit('CHANGE');

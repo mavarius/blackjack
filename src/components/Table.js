@@ -34,6 +34,10 @@ export default class Table extends Component {
     DeckActions.hitMe();
   }
 
+  _stand() {
+    DeckActions.stand();
+  }
+
   _onChange() {
     this.setState( DeckStore.getAll() )
   }
@@ -53,8 +57,8 @@ export default class Table extends Component {
         </div>
         <div className="row buttons">
           <button onClick={this._newGame} className="btn btn-success">NEW GAME</button>
-          { player.total > 0 && player.total <= 21 ? <button onClick={this._hitMe} className="btn btn-danger">HIT ME</button> : <button onClick={this._hitMe} className="btn btn-danger" disabled>HIT ME</button> }
-          { player.total > 0 && player.total <= 21 ? <button className="btn btn-primary">STAND</button> : <button className="btn btn-primary" disabled>STAND</button> }
+          { player.total > 0 && player.total <= 21 && dealer.hidden.length !== 0 ? <button onClick={this._hitMe} className="btn btn-danger">HIT ME</button> : <button className="btn btn-danger" disabled>HIT ME</button> }
+          { player.total > 0 && player.total <= 21 && dealer.hidden.length !== 0 ? <button onClick={this._stand} className="btn btn-primary">STAND</button> : <button className="btn btn-primary" disabled>STAND</button> }
         </div>
       </div>
     )
